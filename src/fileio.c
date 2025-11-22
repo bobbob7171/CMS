@@ -10,13 +10,13 @@
 #include "fileio.h"
 #include "utils.h"
 
-// Build a path inside the data folder, rejecting any user-supplied directories
+/* Build a path inside the data folder, rejecting any user-supplied directories */
 static int buildDataPath(const char* filename, char* buffer, size_t bufferSize) {
     if (!filename || !buffer || bufferSize == 0) {
         return 0;
     }
     
-    // Disallow directory traversal or explicit paths; we only read/write under data/
+    /* Disallow directory traversal or explicit paths; we only read/write under data/ */
     if (strchr(filename, '/') || strchr(filename, '\\')) {
         return 0;
     }
@@ -29,7 +29,7 @@ static int buildDataPath(const char* filename, char* buffer, size_t bufferSize) 
  * Database Management
  * ============================================================================ */
 
-// Initialise an empty in-memory database structure
+/* Initialise an empty in-memory database structure */
 void initDatabase(Database* db) {
     db->count = 0;
     db->isOpen = 0;
@@ -37,14 +37,14 @@ void initDatabase(Database* db) {
     db->filename[0] = '\0';
 }
 
-// Close the currently open database, prompting to save unsaved changes
+/* Close the currently open database, prompting to save unsaved changes */
 void closeDatabase(Database* db) {
     if (!db->isOpen) {
         printf("CMS: No database open.\n");
         return;
     }
     
-    // Prompt the user to save if there are unsaved changes
+    /* Prompt the user to save if there are unsaved changes */
     if (db->isDirty) {
         char response[16];
         while (1) {
@@ -77,9 +77,9 @@ void closeDatabase(Database* db) {
     initDatabase(db);
 }
 
-// Close the current file (if any) and open a new one, with a save prompt
+/* Close the current file (if any) and open a new one, with a save prompt */
 int switchDatabase(Database* db, const char* newFilename) {
-    // Give the user a chance to save or cancel before switching files
+    /* Give the user a chance to save or cancel before switching files */
     if (db->isOpen && db->isDirty) {
         char response[16];
         while (1) {
@@ -125,7 +125,7 @@ int validateStudentID(int id, char* errorMsg) {
         return 0;
     }
     
-    // Count digits to ensure the ID fits the YYXXXXX pattern
+    /* Count digits to ensure the ID fits the YYXXXXX pattern */
     int digitCount = 0;
     int tempId = id;
     while (tempId > 0) {
@@ -138,7 +138,7 @@ int validateStudentID(int id, char* errorMsg) {
         return 0;
     }
     
-    // Validate year prefix (first 2 digits of the ID)
+    /* Validate year prefix (first 2 digits of the ID) */
     int year = id / 100000;
     if (year > 25) {
         sprintf(errorMsg, "Year cannot exceed 25 (currently 2025)");
@@ -168,7 +168,7 @@ int validateName(const char* name, char* errorMsg) {
         return 0;
     }
     
-    // Validate characters and check for at least one letter
+    /* Validate characters and check for at least one letter */
     int hasLetter = 0;
     for (int i = 0; i < len; i++) {
         char c = name[i];
@@ -200,7 +200,7 @@ int validateProgramme(const char* programme, char* errorMsg) {
         return 0;
     }
     
-    // Validate characters and confirm there is at least one letter
+    /* Validate characters and confirm there is at least one letter */
     int hasLetter = 0;
     for (int i = 0; i < len; i++) {
         char c = programme[i];
@@ -226,7 +226,7 @@ int validateMark(const char* markStr, float* outMark, char* errorMsg) {
         return 0;
     }
     
-    // Validate numeric format (digits, optional decimal point, optional sign)
+    /* Validate numeric format (digits, optional decimal point, optional sign) */
     int hasDigit = 0;
     int decimalCount = 0;
     
@@ -240,9 +240,9 @@ int validateMark(const char* markStr, float* outMark, char* errorMsg) {
                 return 0;
             }
         } else if (markStr[i] == '-' && i == 0) {
-            continue; // Allow minus at start
+            continue; /* Allow minus at start */
         } else if (markStr[i] == ' ') {
-            continue; // Skip spaces
+            continue; /* Skip spaces */
         } else {
             sprintf(errorMsg, "Mark must be a number (digits and decimal only)");
             return 0;
@@ -254,7 +254,7 @@ int validateMark(const char* markStr, float* outMark, char* errorMsg) {
         return 0;
     }
     
-    // Validate resulting numeric value is within allowed range
+    /* Validate resulting numeric value is within allowed range */
     float mark = atof(markStr);
     if (mark < 0.0 || mark > 100.0) {
         sprintf(errorMsg, "Mark must be between 0.0 and 100.0");
@@ -269,7 +269,7 @@ int validateMark(const char* markStr, float* outMark, char* errorMsg) {
  * File Operations - Helper Functions
  * ============================================================================ */
 
-// Check for duplicate IDs in database
+/* Check for duplicate IDs in database */
 int checkDuplicateIDs(Database* db) {
     int duplicates = 0;
     
@@ -286,11 +286,11 @@ int checkDuplicateIDs(Database* db) {
     return duplicates;
 }
 
-// Validate file header format
+/* Validate file header format */
 static int validateFileHeader(FILE* file, char* errorMsg) {
     char line[MAX_LINE_LEN];
     
-    // Read and validate header lines (1-4)
+    /* Read and validate header lines (1-4) */
     for (int i = 0; i < 4; i++) {
         if (!fgets(line, sizeof(line), file)) {
             sprintf(errorMsg, "File format error: Missing header line %d", i + 1);
@@ -298,13 +298,13 @@ static int validateFileHeader(FILE* file, char* errorMsg) {
         }
     }
     
-    // Read and validate column headers (line 5)
+    /* Read and validate column headers (line 5) */
     if (!fgets(line, sizeof(line), file)) {
         sprintf(errorMsg, "File format error: Missing column headers");
         return 0;
     }
     
-    // Check for required column names in a case-insensitive way
+    /* Check for required column names in a case-insensitive way */
     char upperLine[MAX_LINE_LEN];
     strncpy(upperLine, line, MAX_LINE_LEN - 1);
     upperLine[MAX_LINE_LEN - 1] = '\0';
@@ -319,13 +319,13 @@ static int validateFileHeader(FILE* file, char* errorMsg) {
     return 1;
 }
 
-// Parse a single record line from file
+/* Parse a single record line from file */
 static int parseRecordLine(const char* line, StudentRecord* record, int lineNum, char* errorMsg) {
     char lineCopy[MAX_LINE_LEN];
     strncpy(lineCopy, line, MAX_LINE_LEN - 1);
     lineCopy[MAX_LINE_LEN - 1] = '\0';
     
-    // Parse ID column (first field)
+    /* Parse ID column (first field) */
     char* token = strtok(lineCopy, "\t");
     if (!token) {
         sprintf(errorMsg, "Missing ID field");
@@ -334,7 +334,7 @@ static int parseRecordLine(const char* line, StudentRecord* record, int lineNum,
     
     trimWhitespace(token);
     
-    // Validate ID is numeric before converting to integer
+    /* Validate ID is numeric before converting to integer */
     for (int i = 0; token[i]; i++) {
         if (!isdigit(token[i])) {
             sprintf(errorMsg, "ID must be numeric, got '%s'", token);
@@ -350,7 +350,7 @@ static int parseRecordLine(const char* line, StudentRecord* record, int lineNum,
     }
     record->id = id;
     
-    // Parse Name column (second field)
+    /* Parse Name column (second field) */
     token = strtok(NULL, "\t");
     if (!token || strlen(token) == 0) {
         sprintf(errorMsg, "Missing Name field");
@@ -367,7 +367,7 @@ static int parseRecordLine(const char* line, StudentRecord* record, int lineNum,
     record->name[MAX_NAME_LEN - 1] = '\0';
     record->hasName = 1;
     
-    // Parse Programme column (third field)
+    /* Parse Programme column (third field) */
     token = strtok(NULL, "\t");
     if (!token || strlen(token) == 0) {
         sprintf(errorMsg, "Missing Programme field");
@@ -384,7 +384,7 @@ static int parseRecordLine(const char* line, StudentRecord* record, int lineNum,
     record->programme[MAX_PROGRAMME_LEN - 1] = '\0';
     record->hasProgramme = 1;
     
-    // Parse Mark column (fourth field)
+    /* Parse Mark column (fourth field) */
     token = strtok(NULL, "\t\n\r");
     if (!token || strlen(token) == 0) {
         sprintf(errorMsg, "Missing Mark field");
@@ -436,7 +436,7 @@ int openDatabase(Database* db, const char* filename) {
         return 0;
     }
     
-    // Validate basic file structure and column headers
+    /* Validate basic file structure and column headers */
     char errorMsg[256];
     if (!validateFileHeader(file, errorMsg)) {
         printf("CMS: %s\n", errorMsg);
@@ -451,7 +451,7 @@ int openDatabase(Database* db, const char* filename) {
         return 0;
     }
     
-    // Read data records line by line, stopping at MAX_RECORDS
+    /* Read data records line by line, stopping at MAX_RECORDS */
     db->count = 0;
     int lineNum = 5;
     int recordsLoaded = 0;
@@ -461,10 +461,10 @@ int openDatabase(Database* db, const char* filename) {
     while (fgets(line, sizeof(line), file) && db->count < MAX_RECORDS) {
         lineNum++;
         
-        // Skip empty or whitespace-only lines
+        /* Skip empty or whitespace-only lines */
         if (isEmpty(line)) continue;
         
-        // Parse record and apply validation on each field
+        /* Parse record and apply validation on each field */
         StudentRecord tempRecord;
         char recordError[256];
         
@@ -479,13 +479,13 @@ int openDatabase(Database* db, const char* filename) {
     
     fclose(file);
     
-    // Check if in-memory table has reached its maximum capacity
+    /* Check if in-memory table has reached its maximum capacity */
     if (db->count >= MAX_RECORDS) {
         printf("  WARNING: Database is full. Maximum %d records loaded.\n", MAX_RECORDS);
         printf("           Additional records in file were ignored.\n");
     }
     
-    // Update database state after successful load
+    /* Update database state after successful load */
     db->isOpen = 1;
     db->isDirty = 0;
     strncpy(db->filename, cleanName, MAX_FILENAME_LEN - 1);
@@ -498,7 +498,7 @@ int openDatabase(Database* db, const char* filename) {
         printf("     Skipped %d invalid record(s). See warnings above.\n", recordsSkipped);
     }
     
-    // Data quality report to give a quick overview of loaded data
+    /* Data quality report to give a quick overview of loaded data */
     if (db->count > 0) {
         printf("===============================================================================\n");
         printf("Data Quality Report\n");
@@ -536,13 +536,13 @@ int saveDatabase(Database* db) {
         return 0;
     }
     
-    // Write file header and column names
+    /* Write file header and column names */
     fprintf(file, "Database Name: P1_2-CMS\n");
     fprintf(file, "Authors: Assistant Prof Oran Zane Devilly\n\n");
     fprintf(file, "Table Name: StudentRecords\n");
     fprintf(file, "ID\tName\tProgramme\tMark\n");
     
-    // Write each record in tab-separated format
+    /* Write each record in tab-separated format */
     for (int i = 0; i < db->count; i++) {
         fprintf(file, "%d\t%s\t%s\t%.1f\n",
                 db->records[i].id,

@@ -16,7 +16,7 @@
  * Helper Functions
  * ============================================================================ */
 
-// Returns the index of the record with the given ID, or -1 if not found
+/* Returns the index of the record with the given ID, or -1 if not found */
 int findRecordIndex(Database* db, int id) {
     for (int i = 0; i < db->count; i++) {
         if (db->records[i].id == id) {
@@ -26,7 +26,7 @@ int findRecordIndex(Database* db, int id) {
     return -1;
 }
 
-// Print a single student record in a compact, readable format
+/* Print a single student record in a compact, readable format */
 void displayRecordSummary(StudentRecord* rec) {
     printf("-------------------------------------------------------------------------------\n");
     printf("Record Summary\n");
@@ -42,7 +42,7 @@ void displayRecordSummary(StudentRecord* rec) {
  * Display Operations
  * ============================================================================ */
 
-// Print all records in a simple table with paging to avoid flooding the screen
+/* Print all records in a simple table with paging to avoid flooding the screen */
 void showAll(Database* db) {
     if (db == NULL || db->count == 0) {
         printf("CMS: No records found.\n");
@@ -51,7 +51,7 @@ void showAll(Database* db) {
     
     printf("CMS: Here are all the records found in the table \"StudentRecords\".\n");
 
-    // Show results in small chunks so very large datasets stay readable
+    /* Show results in small chunks so very large datasets stay readable */
     const int PAGE_SIZE = 20;
     char input[32];
     int displayed = 0;
@@ -68,7 +68,7 @@ void showAll(Database* db) {
         displayed++;
 
         if ((i + 1) % PAGE_SIZE == 0 && (i + 1) < db->count) {
-            // After each page, give the user a chance to stop
+            /* After each page, give the user a chance to stop */
             printf("-------------------------------------------------------------------------------\n");
             printf("-- Showing %d of %d record(s). Press Enter to continue, or type 'cancel' to stop --\n", 
                    i + 1, db->count);
@@ -91,7 +91,7 @@ void showAll(Database* db) {
     printf("CMS: Displayed %d of %d record(s).\n", displayed, db->count);
 }
 
-// Show an interactive menu for the SHOW command (sorting, filtering, summary)
+/* Show an interactive menu for the SHOW command (sorting, filtering, summary) */
 void showMenu(Database* db) {
     printf("-------------------------------------------------------------------------------\n");
     printf("SHOW Menu\n");
@@ -106,7 +106,7 @@ void showMenu(Database* db) {
     printf("0. Cancel\n");
     printf("-------------------------------------------------------------------------------\n");
     
-    // Loop until the user enters a valid option or cancels
+    /* Loop until the user enters a valid option or cancels */
     while (1) {
         printf("Choice: ");
         char input[10];
@@ -131,7 +131,7 @@ void showMenu(Database* db) {
             case 4: showAllSorted(db, "MARK"); return;
             case 5: showAllSorted(db, "MARK_DESC"); return;
             case 6: {
-                // Interactive filter by mark
+                /* Interactive filter by mark */
                 char op[10], valueStr[20];
                 
                 while (1) {
@@ -144,7 +144,7 @@ void showMenu(Database* db) {
                         return;
                     }
                     
-                    // Validation of operator string
+                    /* Validation of operator string */
                     if (strcmp(op, "=") != 0 && strcmp(op, "!=") != 0 && 
                         strcmp(op, "<") != 0 && strcmp(op, ">") != 0 && 
                         strcmp(op, "<=") != 0 && strcmp(op, ">=") != 0) {
@@ -164,7 +164,7 @@ void showMenu(Database* db) {
                         return;
                     }
                     
-                    // Detects non-numeric characters
+                    /* Detects non-numeric characters */
                     char* endptr;
                     double val = strtod(valueStr, &endptr);
                     if (valueStr == endptr || *endptr != '\0' || val < 0 || val > 100) {
@@ -215,7 +215,7 @@ int insertRecordDirect(Database* db, const char* params) {
         return OP_ERROR;
     }
     
-    // Parse required parameters from the command string
+    /* Parse required parameters from the command string */
     char idStr[50], name[MAX_NAME_LEN], programme[MAX_PROGRAMME_LEN], markStr[50];
     char errorMsg[256];
     
@@ -239,7 +239,7 @@ int insertRecordDirect(Database* db, const char* params) {
         return OP_ERROR;
     }
     
-    // Validate ID value and logical rules
+    /* Validate ID value and logical rules */
     int id = atoi(idStr);
     if (id == 0 && strcmp(idStr, "0") != 0) {
         printf("CMS: ID must be numeric.\n");
@@ -256,7 +256,7 @@ int insertRecordDirect(Database* db, const char* params) {
         return OP_ERROR;
     }
     
-    // Validate other fields using shared validation helpers
+    /* Validate other fields using shared validation helpers */
     if (!validateName(name, errorMsg)) {
         printf("CMS: %s\n", errorMsg);
         return OP_ERROR;
@@ -273,7 +273,7 @@ int insertRecordDirect(Database* db, const char* params) {
         return OP_ERROR;
     }
     
-    // Create record
+    /* Create record */
     StudentRecord* rec = &db->records[db->count];
     rec->id = id;
     strncpy(rec->name, name, MAX_NAME_LEN - 1);
@@ -304,7 +304,7 @@ int insertRecordInteractive(Database* db, int id) {
     char input[MAX_NAME_LEN];
     char errorMsg[256];
     
-    // Get ID if not provided
+    /* Get ID if not provided */
     if (id < 0) {
         while (1) {
             getInput("Student ID (7 digits, YYXXXXX): ", input, sizeof(input));
@@ -319,7 +319,7 @@ int insertRecordInteractive(Database* db, int id) {
                 continue;
             }
             
-            // Check if numeric
+            /* Check if numeric */
             int isNumeric = 1;
             for (int i = 0; input[i]; i++) {
                 if (!isdigit(input[i])) {
@@ -360,7 +360,7 @@ int insertRecordInteractive(Database* db, int id) {
     rec->hasProgramme = 1;
     rec->hasMark = 1;
     
-    // Get Name
+    /* Get Name */
     while (1) {
         getInput("Name: ", input, sizeof(input));
         
@@ -384,7 +384,7 @@ int insertRecordInteractive(Database* db, int id) {
         break;
     }
     
-    // Get Programme
+    /* Get Programme */
     while (1) {
         getInput("Programme: ", input, sizeof(input));
         
@@ -408,7 +408,7 @@ int insertRecordInteractive(Database* db, int id) {
         break;
     }
     
-    // Get Mark
+    /* Get Mark */
     while (1) {
         getInput("Mark (0-100): ", input, sizeof(input));
         
@@ -462,7 +462,7 @@ int updateRecordDirect(Database* db, int id, const char* params) {
     
     printf("CMS: Updating record ID=%d...\n", id);
     
-    // Update Name if provided
+    /* Update Name if provided */
     if (parseKeyValue(params, "Name", value) && !isEmpty(value)) {
         if (validateName(value, errorMsg)) {
             strncpy(rec->name, value, MAX_NAME_LEN - 1);
@@ -473,7 +473,7 @@ int updateRecordDirect(Database* db, int id, const char* params) {
         }
     }
     
-    // Update Programme if provided
+    /* Update Programme if provided */
     if (parseKeyValue(params, "Programme", value) && !isEmpty(value)) {
         if (validateProgramme(value, errorMsg)) {
             strncpy(rec->programme, value, MAX_PROGRAMME_LEN - 1);
@@ -484,7 +484,7 @@ int updateRecordDirect(Database* db, int id, const char* params) {
         }
     }
     
-    // Update Mark if provided
+    /* Update Mark if provided */
     if (parseKeyValue(params, "Mark", value) && !isEmpty(value)) {
         float mark;
         if (validateMark(value, &mark, errorMsg)) {
@@ -499,7 +499,7 @@ int updateRecordDirect(Database* db, int id, const char* params) {
         db->isDirty = 1;
         printf("CMS: The record with ID=%d is successfully updated.\n", id);
         
-        // Show changes
+        /* Show changes */
         printf("-------------------------------------------------------------------------------\n");
         printf("Changes Made\n");
         printf("-------------------------------------------------------------------------------\n");
@@ -540,7 +540,7 @@ int updateRecordInteractive(Database* db, int id) {
     printf("UPDATE ID=%d\n", id);
     printf("-------------------------------------------------------------------------------\n");
     
-    // Update Name
+    /* Update Name */
     while (1) {
         printf("Current Name: %s\n", rec->name);
         getInput("New Name (Enter to keep, 'cancel' to abort): ", input, sizeof(input));
@@ -550,7 +550,7 @@ int updateRecordInteractive(Database* db, int id) {
             return OP_CANCELLED;
         }
         
-        if (isEmpty(input)) break; // Keep current value
+        if (isEmpty(input)) break; /* Keep current value */
         
         if (validateName(input, errorMsg)) {
             strncpy(rec->name, input, MAX_NAME_LEN - 1);
@@ -562,7 +562,7 @@ int updateRecordInteractive(Database* db, int id) {
         }
     }
     
-    // Update Programme
+    /* Update Programme */
     while (1) {
         printf("Current Programme: %s\n", rec->programme);
         getInput("New Programme (Enter to keep, 'cancel' to abort): ", input, sizeof(input));
@@ -572,7 +572,7 @@ int updateRecordInteractive(Database* db, int id) {
             return OP_CANCELLED;
         }
         
-        if (isEmpty(input)) break; // Keep current value
+        if (isEmpty(input)) break; /* Keep current value */
         
         if (validateProgramme(input, errorMsg)) {
             strncpy(rec->programme, input, MAX_PROGRAMME_LEN - 1);
@@ -584,7 +584,7 @@ int updateRecordInteractive(Database* db, int id) {
         }
     }
     
-    // Update Mark
+    /* Update Mark */
     while (1) {
         printf("Current Mark: %.1f\n", rec->mark);
         getInput("New Mark (Enter to keep, 'cancel' to abort): ", input, sizeof(input));
@@ -594,7 +594,7 @@ int updateRecordInteractive(Database* db, int id) {
             return OP_CANCELLED;
         }
         
-        if (isEmpty(input)) break; // Keep current value
+        if (isEmpty(input)) break; /* Keep current value */
         
         float mark;
         if (validateMark(input, &mark, errorMsg)) {
@@ -608,7 +608,7 @@ int updateRecordInteractive(Database* db, int id) {
     
     printf("CMS: The record with ID=%d is successfully updated.\n", id);
     
-    // Show changes if any were made
+    /* Show changes if any were made */
     if (strcmp(oldRec.name, rec->name) != 0 ||
         strcmp(oldRec.programme, rec->programme) != 0 ||
         oldRec.mark != rec->mark) {
@@ -663,7 +663,7 @@ int deleteRecord(Database* db, int id) {
         }
         
         if (response[0] == 'Y' || response[0] == 'y') {
-            // Shift records to fill the gap
+            /* Shift records to fill the gap */
             for (int i = pos; i < db->count - 1; i++) {
                 db->records[i] = db->records[i + 1];
             }

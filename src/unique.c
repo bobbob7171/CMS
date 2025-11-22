@@ -16,13 +16,12 @@
  * UNIQUE FEATURE 1: Help and Declaration System
  * ============================================================================ */
 
-// Print a one-page overview of all commands and rules
+/* Print a one-page overview of all commands and rules */
 void displayHelp(void) {
     printf("\n");
     printf("===============================================================================\n");
     printf("                    CLASS MANAGEMENT SYSTEM - COMMANDS\n");
     printf("===============================================================================\n");
-    printf("\n");
     
     printf("FILE MANAGEMENT:\n");
     printf("  OPEN [filename]      Open database (files stored in data/)\n");
@@ -39,11 +38,12 @@ void displayHelp(void) {
     printf("  SHOW ALL SORT BY [FIELD] [ASC/DESC]    Sort by field and order\n");
     printf("  SHOW ALL WHERE MARK [OP] [VALUE]       Filter by mark (=, !=, <, >, <=, >=)\n");
     printf("  SHOW SUMMARY         Display statistics\n");
-    printf("  INSERT ID=xxx        Add new record\n");
+    printf("  INSERT ID=xxx        Add new record (include direct/interactive mode)\n");
     printf("  QUERY ID=xxx         Find record by ID\n");
-    printf("  UPDATE ID=xxx        Update record\n");
+    printf("  UPDATE ID=xxx        Update record (include direct/interactive mode)\n");
     printf("  DELETE ID=xxx        Delete record\n");
     printf("\n");
+    printf("  Examples: INSERT ID=2301234 Name=\"John Doe\" Programme=\"CS\" Mark=85.5\n\n");
     
     printf("SEARCH & ANALYTICS:\n");
     printf("  SEARCH <keyword>     Search in all fields (ID, Name, Programme, Mark)\n");
@@ -71,7 +71,7 @@ void displayHelp(void) {
     printf("\n");
 }
 
-// Show the academic integrity / plagiarism declaration once at startup
+/* Show the academic integrity / plagiarism declaration once at startup */
 void displayDeclaration(void) {
     printf("\n");
     printf("===============================================================================\n");
@@ -118,7 +118,7 @@ void displayDeclaration(void) {
     printf("    5. [Member Name 5]\n");
     printf("\n");
     
-    // Display current date
+    /* Display current date */
     time_t now;
     struct tm* timeInfo;
     char dateStr[80];
@@ -128,21 +128,20 @@ void displayDeclaration(void) {
     strftime(dateStr, sizeof(dateStr), "%B %d, %Y", timeInfo);
     
     printf("  Declaration Date: %s\n\n", dateStr);
-    printf("-------------------------------------------------------------------------------\n");
 }
 
 /* ============================================================================
  * UNIQUE FEATURE 2: Advanced Keyword Search
  * ============================================================================ */
 
-// Search for a free-text keyword across ID, name, programme, and mark
+/* Search for a free-text keyword across ID, name, programme, and mark */
 void searchByKeyword(Database* db, const char* searchTerm) {
     if (db->count == 0) {
         printf("CMS: No records in the database to search.\n");
         return;
     }
     
-    // Use a lowercased copy of the search term for case-insensitive matches
+    /* Use a lowercased copy of the search term for case-insensitive matches */
     char lowerSearch[MAX_NAME_LEN];
     strncpy(lowerSearch, searchTerm, MAX_NAME_LEN - 1);
     lowerSearch[MAX_NAME_LEN - 1] = '\0';
@@ -157,7 +156,7 @@ void searchByKeyword(Database* db, const char* searchTerm) {
         char lowerProgramme[MAX_PROGRAMME_LEN];
         char idStr[20], markStr[20];
         
-        // Prepare searchable strings
+        /* Prepare searchable strings */
         sprintf(idStr, "%d", db->records[i].id);
         sprintf(markStr, "%.1f", db->records[i].mark);
         
@@ -169,7 +168,7 @@ void searchByKeyword(Database* db, const char* searchTerm) {
         lowerProgramme[MAX_PROGRAMME_LEN - 1] = '\0';
         toLowerCase(lowerProgramme);
         
-        // Search in all fields
+        /* Search in all fields */
         if (strstr(idStr, searchTerm) || strstr(lowerName, lowerSearch) || 
             strstr(lowerProgramme, lowerSearch) || strstr(markStr, searchTerm)) {
             
@@ -191,7 +190,7 @@ void searchByKeyword(Database* db, const char* searchTerm) {
             displayed++;
 
             if (displayed % 20 == 0) {
-                // Paginate results so long searches do not flood the screen
+                /* Paginate results so long searches do not flood the screen */
                 char input[32];
                 printf("-------------------------------------------------------------------------------\n");
                 printf("-- Showing %d of %d matching record(s). Press Enter to continue, or type 'cancel' to stop --\n",
@@ -225,7 +224,7 @@ void searchByKeyword(Database* db, const char* searchTerm) {
  * UNIQUE FEATURE 3: Duplicate Detection and Removal
  * ============================================================================ */
 
-// Check if two records are exact copies
+/* Check if two records are exact copies */
 static int isExactDuplicate(StudentRecord* a, StudentRecord* b) {
     return (a->id == b->id &&
             strcmp(a->name, b->name) == 0 &&
@@ -243,17 +242,17 @@ void checkDuplicates(Database* db) {
     printf("CMS: Checking for Duplicates\n");
     printf("-------------------------------------------------------------------------------\n");
     
-    // Track records that are removed so we can report them at the end
+    /* Track records that are removed so we can report them at the end */
     StudentRecord deleted[MAX_RECORDS];
     int deletedCount = 0;
-    // Keep track of which IDs we have already inspected
+    /* Keep track of which IDs we have already inspected */
     int processedIDs[MAX_RECORDS];
     int processedCount = 0;
     
     for (int i = 0; i < db->count; i++) {
         int id = db->records[i].id;
         
-        // Skip if already processed
+        /* Skip if already processed */
         int alreadyProcessed = 0;
         for (int p = 0; p < processedCount; p++) {
             if (processedIDs[p] == id) {
@@ -265,7 +264,7 @@ void checkDuplicates(Database* db) {
         
         processedIDs[processedCount++] = id;
         
-        // Find all records with this ID
+        /* Find all records with this ID */
         int positions[MAX_RECORDS];
         int posCount = 0;
         for (int j = 0; j < db->count; j++) {
@@ -276,20 +275,20 @@ void checkDuplicates(Database* db) {
         
         if (posCount <= 1) continue;
         
-        // Remove exact duplicates for this ID but keep one copy
+        /* Remove exact duplicates for this ID but keep one copy */
         for (int a = 0; a < posCount; a++) {
             for (int b = a + 1; b < posCount; b++) {
                 if (isExactDuplicate(&db->records[positions[a]], &db->records[positions[b]])) {
-                    // Save deleted record
+                    /* Save deleted record */
                     deleted[deletedCount++] = db->records[positions[b]];
                     
-                    // Remove from database
+                    /* Remove from database */
                     for (int k = positions[b]; k < db->count - 1; k++) {
                         db->records[k] = db->records[k + 1];
                     }
                     db->count--;
                     
-                    // Update positions array
+                    /* Update positions array */
                     for (int s = b; s < posCount - 1; s++) {
                         positions[s] = positions[s + 1];
                     }
@@ -299,7 +298,7 @@ void checkDuplicates(Database* db) {
             }
         }
         
-        // Report conflicts if same ID still has multiple non-identical records
+        /* Report conflicts if same ID still has multiple non-identical records */
         if (posCount > 1) {
             printf("Conflict for ID %d (%d unique records): positions ", id, posCount);
             for (int u = 0; u < posCount; u++) {
@@ -310,7 +309,7 @@ void checkDuplicates(Database* db) {
         }
     }
     
-    // Report deleted duplicates
+    /* Report deleted duplicates */
     if (deletedCount > 0) {
         printf("\n");
         printf("Exact Duplicates Removed:\n");
@@ -344,7 +343,7 @@ void exportToCSV(Database* db, const char* command) {
     char filename[256];
     const char* customName = NULL;
     
-    // Check for custom filename after the EXPORT keyword, if any
+    /* Check for custom filename after the EXPORT keyword, if any */
     if (command && strlen(command) > 6) {
         customName = command + 6;
         while (*customName == ' ') customName++;
@@ -355,7 +354,7 @@ void exportToCSV(Database* db, const char* command) {
         filename[sizeof(filename) - 5] = '\0';
         trimWhitespace(filename);
         
-        // Ensure the file has a .csv extension
+        /* Ensure the file has a .csv extension */
         if (strlen(filename) < 4 || strcmp(filename + strlen(filename) - 4, ".csv") != 0) {
             strcat(filename, ".csv");
         }
@@ -369,10 +368,10 @@ void exportToCSV(Database* db, const char* command) {
         return;
     }
     
-    // Write CSV header row
+    /* Write CSV header row */
     fprintf(file, "ID,Name,Programme,Mark\n");
     
-    // Write each record as a single CSV line
+    /* Write each record as a single CSV line */
     for (int i = 0; i < db->count; i++) {
         fprintf(file, "%d,\"%s\",\"%s\",%.1f\n",
                 db->records[i].id,
@@ -412,7 +411,7 @@ static int historyInitialized = 0;
 void initializeUndoHistory(void) {
     if (historyInitialized) return;
     
-    // Allocate a fixed ring buffer of snapshots for undo/redo
+    /* Allocate a fixed ring buffer of snapshots for undo/redo */
     history = (DatabaseSnapshot*)calloc(MAX_HISTORY, sizeof(DatabaseSnapshot));
     if (!history) {
         printf("  WARNING: Unable to allocate memory for undo/redo feature.\n");
@@ -426,7 +425,7 @@ void initializeUndoHistory(void) {
     
     historyInitialized = 1;
     
-    // Print a small diagnostic so the user knows memory cost of undo/redo
+    /* Print a small diagnostic so the user knows memory cost of undo/redo */
     size_t totalSize = sizeof(DatabaseSnapshot) * MAX_HISTORY;
     printf("  Undo/Redo initialized: %d snapshots, %.2f KB total memory\n", 
            MAX_HISTORY, totalSize / 1024.0);
@@ -442,11 +441,11 @@ void cleanupUndoHistory(void) {
     }
 }
 
-// Take a snapshot of current database
+/* Take a snapshot of current database */
 static void createSnapshot(DatabaseSnapshot* snapshot, Database* db) {
     if (!snapshot || !db) return;
     
-    // Copy only the active records and basic metadata into the snapshot
+    /* Copy only the active records and basic metadata into the snapshot */
     memcpy(snapshot->records, db->records, sizeof(StudentRecord) * db->count);
     snapshot->count = db->count;
     strncpy(snapshot->filename, db->filename, MAX_FILENAME_LEN - 1);
@@ -454,17 +453,17 @@ static void createSnapshot(DatabaseSnapshot* snapshot, Database* db) {
     snapshot->isValid = 1;
 }
 
-// Restore database content from snapshot
+/* Restore database content from snapshot */
 static void restoreSnapshot(Database* db, DatabaseSnapshot* snapshot) {
     if (!db || !snapshot || !snapshot->isValid) return;
     
-    // Overwrite the in-memory database with the stored snapshot
+    /* Overwrite the in-memory database with the stored snapshot */
     memcpy(db->records, snapshot->records, sizeof(StudentRecord) * snapshot->count);
     db->count = snapshot->count;
     db->isDirty = 1;
 }
 
-// New state recorded
+/* New state recorded */
 void saveStateForUndo(Database* db) {
     if (!db->isOpen) return;
     
@@ -473,10 +472,10 @@ void saveStateForUndo(Database* db) {
         if (!historyInitialized) return;
     }
     
-    // Move current position forward to store a new snapshot
+    /* Move current position forward to store a new snapshot */
     currentPosition++;
     
-    // Invalidate any redo history ahead of the new position
+    /* Invalidate any redo history ahead of the new position */
     if (currentPosition < historyCount) {
         for (int i = currentPosition; i < historyCount; i++) {
             history[i].isValid = 0;
@@ -484,7 +483,7 @@ void saveStateForUndo(Database* db) {
         historyCount = currentPosition;
     }
     
-    // When buffer is full, drop the oldest snapshot and compact the array
+    /* When buffer is full, drop the oldest snapshot and compact the array */
     if (currentPosition >= MAX_HISTORY) {
         for (int i = 0; i < MAX_HISTORY - 1; i++) {
             if (history[i + 1].isValid) {
@@ -511,7 +510,7 @@ void undoLastOperation(Database* db) {
         return;
     }
     
-    // Step back one snapshot in the history buffer
+    /* Step back one snapshot in the history buffer */
     currentPosition--;
     
     if (history[currentPosition].isValid) {
@@ -535,10 +534,10 @@ void redoLastOperation(Database* db) {
         return;
     }
     
-    // Step forward one snapshot in the history buffer
+    /* Step forward one snapshot in the history buffer */
     currentPosition++;
     
-    // Can only redo if there is snapshot ahead of current position
+    /* Can only redo if there is snapshot ahead of current position */
     if (history[currentPosition].isValid) {
         restoreSnapshot(db, &history[currentPosition]);
         printf("CMS: Redo successful. Restored to next state.\n");
@@ -562,7 +561,7 @@ static struct {
 void initializeAutosave(Database* db) {
     if (autosaveState.initialized) return;
     
-    // Bind autosave to the active database instance
+    /* Bind autosave to the active database instance */
     autosaveState.db = db;
     autosaveState.enabled = 0;
     autosaveState.modified = 0;
@@ -577,12 +576,12 @@ void setAutosaveEnabled(int enabled) {
         return;
     }
     
-    // Store autosave flag as 0/1 for clarity
+    /* Store autosave flag as 0/1 for clarity */
     autosaveState.enabled = enabled ? 1 : 0;
     
-    // If autosave is turned on, immediately flush any pending changes
+    /* If autosave is turned on, immediately flush any pending changes */
     if (autosaveState.enabled && autosaveState.modified) {
-        // Trigger autosave for pending changes
+        /* Trigger autosave for pending changes */
         if (autosaveState.db && autosaveState.db->isOpen && autosaveState.db->isDirty) {
             saveDatabase(autosaveState.db);
             autosaveState.modified = 0;
@@ -599,7 +598,7 @@ void cleanupAutosave(void) {
     if (!autosaveState.initialized) return;
     
     if (autosaveState.enabled && autosaveState.modified) {
-        // Final autosave before cleanup so no changes are lost
+        /* Final autosave before cleanup so no changes are lost */
         if (autosaveState.db && autosaveState.db->isOpen && autosaveState.db->isDirty) {
             saveDatabase(autosaveState.db);
         }
@@ -611,14 +610,14 @@ void cleanupAutosave(void) {
     autosaveState.db = NULL;
 }
 
-// Indicates database content have changed
+/* Indicates database content have changed */
 void markDatabaseModified(Database* db) {
     if (!autosaveState.initialized || autosaveState.db != db) return;
     
     autosaveState.modified = 1;
     
     if (autosaveState.enabled) {
-        // Trigger autosave immediately
+        /* Trigger autosave immediately */
         if (db->isOpen && db->isDirty) {
             saveDatabase(db);
             autosaveState.modified = 0;

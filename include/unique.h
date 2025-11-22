@@ -8,27 +8,27 @@
 
 #include "fileio.h"
 
-// Feature 1: Help and Declaration
+/* Feature 1: Help and Declaration */
 void displayHelp(void);
 void displayDeclaration(void);
 
-// Feature 2: Advanced Search
+/* Feature 2: Advanced Search */
 void searchByKeyword(Database* db, const char* searchTerm);
 
-// Feature 3: Duplicate Management
+/* Feature 3: Duplicate Management */
 void checkDuplicates(Database* db);
 
-// Feature 4: CSV Export
+/* Feature 4: CSV Export */
 void exportToCSV(Database* db, const char* command);
 
-// Feature 5: Undo/Redo System
+/* Feature 5: Undo/Redo System */
 void initializeUndoHistory(void);
 void cleanupUndoHistory(void);
 void saveStateForUndo(Database* db);
 void undoLastOperation(Database* db);
 void redoLastOperation(Database* db);
 
-// Feature 6: Autosave System
+/* Feature 6: Autosave System */
 void initializeAutosave(Database* db);
 void setAutosaveEnabled(int enabled);
 int isAutosaveEnabled(void);

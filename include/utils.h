@@ -6,14 +6,14 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-// String manipulation
+/* String manipulation */
 void trimWhitespace(char* str);
 void toUpperCase(char* str);
 void toLowerCase(char* str);
-
-// Command parsing
-int parseKeyValue(const char* params, const char* key, char* value);
 int isEmpty(const char* str);
 void getInput(const char* prompt, char* buffer, int size);
+
+/* Command parsing */
+int parseKeyValue(const char* params, const char* key, char* value);
 
 #endif

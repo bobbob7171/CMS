@@ -12,7 +12,7 @@
 #include "enhance.h"
 #include "utils.h"
 
-// Constants
+/* Constants */
 #define PASS_MARK 50.0
 #define TOP_N 3
 
@@ -20,17 +20,17 @@
  * Sorting Helper Functions
  * ============================================================================ */
 
-// Returns non-zero if the two IDs are out of order for the given direction
+/* Returns non-zero if the two IDs are out of order for the given direction */
 static int compareByID(StudentRecord a, StudentRecord b, int ascending) {
     return ascending ? (a.id > b.id) : (a.id < b.id);
 }
 
-// Returns non-zero if the two marks are out of order for the given direction
+/* Returns non-zero if the two marks are out of order for the given direction */
 static int compareByMark(StudentRecord a, StudentRecord b, int ascending) {
     return ascending ? (a.mark > b.mark) : (a.mark < b.mark);
 }
 
-// Sort student records by ID (using optimized bubble sort with early exit)
+/* Sort student records by ID (using optimized bubble sort with early exit) */
 static void sortByID(StudentRecord* records, int count, int ascending) {
     for (int i = 0; i < count - 1; i++) {
         int swapped = 0;
@@ -42,15 +42,15 @@ static void sortByID(StudentRecord* records, int count, int ascending) {
                 swapped = 1;
             }
         }
-        // If we went through a full pass with no swaps, the array is sorted
+        /* If we went through a full pass with no swaps, the array is sorted */
         if (!swapped) break;
     }
 }
 
-// Sort student records by Mark (using optimized bubble sort with early exit)
+/* Sort student records by Mark (using optimized bubble sort with early exit) */
 static void sortByMark(StudentRecord* records, int count, int ascending) {
     for (int i = 0; i < count - 1; i++) {
-        // Track whether any swap happened during this pass
+        /* Track whether any swap happened during this pass */
         int swapped = 0;
         for (int j = 0; j < count - i - 1; j++) {
             if (compareByMark(records[j], records[j + 1], ascending)) {
@@ -60,7 +60,7 @@ static void sortByMark(StudentRecord* records, int count, int ascending) {
                 swapped = 1;
             }
         }
-        // If no swaps occurred in this pass, the array is already sorted
+        /* If no swaps occurred in this pass, the array is already sorted */
         if (!swapped) break;
     }
 }
@@ -78,7 +78,7 @@ void showAllSorted(Database* db, const char* sortBy) {
     StudentRecord workingCopy[MAX_RECORDS];
     memcpy(workingCopy, db->records, sizeof(StudentRecord) * db->count);
     
-    // Apply sorting based on requested field and direction
+    /* Apply sorting based on requested field and direction */
     if (sortBy) {
         if (strcmp(sortBy, "ID") == 0 || strcmp(sortBy, "ID_ASC") == 0) {
             sortByID(workingCopy, db->count, 1);
@@ -91,7 +91,7 @@ void showAllSorted(Database* db, const char* sortBy) {
         }
     }
     
-    // Display records with simple pagination (20 per page) 
+    /* Display records with simple pagination (20 per page) */
     printf("CMS: Here are all the records found in the table \"StudentRecords\" (sorted view).\n");
 
     const int PAGE_SIZE = 20;
@@ -110,7 +110,7 @@ void showAllSorted(Database* db, const char* sortBy) {
         displayed++;
 
         if ((i + 1) % PAGE_SIZE == 0 && (i + 1) < db->count) {
-            // Pause after each page and allow the user to cancel the listing
+            /* Pause after each page and allow the user to cancel the listing */
             printf("-------------------------------------------------------------------------------\n");
             printf("-- Showing %d of %d record(s). Press Enter to continue, or type 'cancel' to stop --\n",
                    i + 1, db->count);
@@ -137,24 +137,24 @@ void showAllSorted(Database* db, const char* sortBy) {
  * Command Parsing for Sorting
  * ============================================================================ */
 
-// Parse and execute "SHOW ALL SORT BY ..." commands.
-// Returns: 1 if valid and executed, 0 if invalid, -1 if not a sort command.
+/* Parse and execute "SHOW ALL SORT BY ..." commands. */
+/* Returns: 1 if valid and executed, 0 if invalid, -1 if not a sort command. */
 int parseAndExecuteSort(Database* db, const char* command) {
-    // Convert to uppercase for comparison
+    /* Convert to uppercase for comparison */
     char upperCmd[512];
     strncpy(upperCmd, command, 511);
     upperCmd[511] = '\0';
     toUpperCase(upperCmd);
     
-    // Check if it's a SHOW ALL SORT BY command
+    /* Check if it's a SHOW ALL SORT BY command */
     if (strncmp(upperCmd, "SHOW ALL SORT BY", 16) != 0) {
-        return -1; // Not a sort command
+        return -1; /* Not a sort command */
     }
     
     const char* params = upperCmd + 16;
     while (*params == ' ') params++;
     
-    // Parse field (ID or MARK)
+    /* Parse field (ID or MARK) */
     char field[20] = "";
     if (strncmp(params, "ID", 2) == 0) {
         strcpy(field, "ID");
@@ -169,11 +169,11 @@ int parseAndExecuteSort(Database* db, const char* command) {
         return 0;
     }
     
-    // Skip whitespace
+    /* Skip whitespace */
     while (*params == ' ') params++;
     
-    // Parse order (ASC or DESC) - optional
-    char order[10] = "ASC"; // Default
+    /* Parse order (ASC or DESC) - optional */
+    char order[10] = "ASC"; /* Default */
     if (strlen(params) > 0) {
         if (strncmp(params, "ASC", 3) == 0) {
             strcpy(order, "ASC");
@@ -187,7 +187,7 @@ int parseAndExecuteSort(Database* db, const char* command) {
         }
     }
     
-    // Build sort string and execute
+    /* Build sort string and execute */
     char sortBy[50];
     sprintf(sortBy, "%s_%s", field, order);
     showAllSorted(db, sortBy);
@@ -210,12 +210,12 @@ void showAllFilteredByMark(Database* db, const char* op, float value) {
     int displayed = 0;
     int headerPrinted = 0;
     
-    // Scan and display matching records
+    /* Scan and display matching records */
     for (int i = 0; i < db->count; i++) {
         float mark = db->records[i].mark;
         int match = 0;
         
-        // Check condition
+        /* Check condition */
         if (strcmp(op, "=") == 0) {
             match = (fabsf(mark - value) <= EPSILON);
         } else if (strcmp(op, "!=") == 0) {
@@ -280,7 +280,7 @@ void showAllFilteredByMark(Database* db, const char* op, float value) {
  * ============================================================================ */
 
 int parseAndExecuteMarkFilter(Database* db, const char* command) {
-    // Make uppercase copy for detection
+    /* Make uppercase copy for detection */
     char upperCmd[512];
     strncpy(upperCmd, command, 511);
     upperCmd[511] = '\0';
@@ -288,10 +288,10 @@ int parseAndExecuteMarkFilter(Database* db, const char* command) {
     
     const char* prefix = "SHOW ALL WHERE MARK";
     if (strncmp(upperCmd, prefix, strlen(prefix)) != 0) {
-        return -1; // Not a mark filter command
+        return -1; /* Not a mark filter command */
     }
     
-    // Point to remainder in original command
+    /* Point to remainder in original command */
     const char* params = command + strlen(prefix);
     while (*params == ' ') params++;
     
@@ -301,7 +301,7 @@ int parseAndExecuteMarkFilter(Database* db, const char* command) {
         return 0;
     }
     
-    // Parse operator
+    /* Parse operator */
     char op[3] = {0};
     if (strncmp(params, "<=", 2) == 0 || strncmp(params, ">=", 2) == 0 || 
         strncmp(params, "!=", 2) == 0) {
@@ -316,7 +316,7 @@ int parseAndExecuteMarkFilter(Database* db, const char* command) {
         return 0;
     }
     
-    // Skip whitespace before value
+    /* Skip whitespace before value */
     while (*params == ' ') params++;
     
     if (*params == '\0') {
@@ -324,7 +324,7 @@ int parseAndExecuteMarkFilter(Database* db, const char* command) {
         return 0;
     }
     
-    // Parse numeric value
+    /* Parse numeric value */
     char* endptr = NULL;
     double val = strtod(params, &endptr);
     if (params == endptr) {
@@ -332,7 +332,7 @@ int parseAndExecuteMarkFilter(Database* db, const char* command) {
         return 0;
     }
     
-    // Check for extra characters
+    /* Check for extra characters */
     const char* tail = endptr;
     while (*tail == ' ') tail++;
     if (*tail != '\0') {
@@ -354,7 +354,7 @@ void showSummary(Database* db) {
         return;
     }
     
-    // Initialize tracking variables
+    /* Initialize tracking variables */
     float totalMarks = 0;
     float highestMark = db->records[0].mark;
     float lowestMark = db->records[0].mark;
@@ -362,13 +362,13 @@ void showSummary(Database* db) {
     int lowestIndex = 0;
     int passCount = 0;
     
-    // Programme tracking arrays
+    /* Programme tracking arrays */
     char programmes[MAX_RECORDS][MAX_PROGRAMME_LEN];
     int programmeCounts[MAX_RECORDS] = {0};
     float programmeTotals[MAX_RECORDS] = {0};
     int uniqueProgrammes = 0;
     
-    // First pass: collect basic statistics
+    /* First pass: collect basic statistics */
     for (int i = 0; i < db->count; i++) {
         float mark = db->records[i].mark;
         totalMarks += mark;
@@ -387,7 +387,7 @@ void showSummary(Database* db) {
             passCount++;
         }
         
-        // Track programmes
+        /* Track programmes */
         int found = 0;
         for (int j = 0; j < uniqueProgrammes; j++) {
             if (strcmp(programmes[j], db->records[i].programme) == 0) {
@@ -406,16 +406,16 @@ void showSummary(Database* db) {
         }
     }
     
-    // Calculate statistics
+    /* Calculate statistics */
     float average = totalMarks / db->count;
     float passRate = (passCount * 100.0) / db->count;
     
-    // Display summary
+    /* Display summary */
     printf("-------------------------------------------------------------------------------\n");
     printf("CMS: Summary Statistics\n");
     printf("-------------------------------------------------------------------------------\n");
     
-    // Overall statistics
+    /* Overall statistics */
     printf("OVERALL STATISTICS\n");
     printf("-------------------------------------------------------------------------------\n");
     printf("Total number of students: %d\n", db->count);
@@ -424,7 +424,7 @@ void showSummary(Database* db) {
     printf("Lowest mark: %.1f (%s)\n", lowestMark, db->records[lowestIndex].name);
     printf("Mark range: %.1f\n", highestMark - lowestMark);
     printf("\n");
-    // Pass/Fail breakdown
+    /* Pass/Fail breakdown */
     printf("-------------------------------------------------------------------------------\n");
     printf("PASS/FAIL BREAKDOWN\n");
     printf("-------------------------------------------------------------------------------\n");
@@ -433,7 +433,7 @@ void showSummary(Database* db) {
            db->count - passCount, 100.0 - passRate);
     printf("\n");
     
-    // Grade distribution
+    /* Grade distribution */
     printf("-------------------------------------------------------------------------------\n");
     printf("GRADE DISTRIBUTION\n");
     printf("-------------------------------------------------------------------------------\n");
@@ -462,26 +462,26 @@ void showSummary(Database* db) {
     }
     printf("\n");
     
-    // Programme breakdown
+    /* Programme breakdown */
     printf("-------------------------------------------------------------------------------\n");
     printf("PROGRAMME BREAKDOWN\n");
     printf("-------------------------------------------------------------------------------\n");
     
-    // Sort programmes by count (descending)
+    /* Sort programmes by count (descending) */
     for (int i = 0; i < uniqueProgrammes - 1; i++) {
         for (int j = 0; j < uniqueProgrammes - i - 1; j++) {
             if (programmeCounts[j] < programmeCounts[j + 1]) {
-                // Swap counts
+                /* Swap counts */
                 int tempCount = programmeCounts[j];
                 programmeCounts[j] = programmeCounts[j + 1];
                 programmeCounts[j + 1] = tempCount;
                 
-                // Swap totals
+                /* Swap totals */
                 float tempTotal = programmeTotals[j];
                 programmeTotals[j] = programmeTotals[j + 1];
                 programmeTotals[j + 1] = tempTotal;
                 
-                // Swap names
+                /* Swap names */
                 char tempName[MAX_PROGRAMME_LEN];
                 strcpy(tempName, programmes[j]);
                 strcpy(programmes[j], programmes[j + 1]);
@@ -498,7 +498,7 @@ void showSummary(Database* db) {
     }
     printf("\n");
     
-    // Top performers
+    /* Top performers */
     printf("-------------------------------------------------------------------------------\n");
     printf("TOP PERFORMERS\n");
     printf("-------------------------------------------------------------------------------\n");

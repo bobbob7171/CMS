@@ -18,7 +18,7 @@
  * Command Processing
  * ============================================================================ */
 
-// Interpret a single user command string and dispatch it to the right handler
+/* Interpret a single user command string and dispatch it to the right handler */
 static int processCommand(Database* db, const char* input) {
     char command[MAX_COMMAND_LEN];
     strcpy(command, input);
@@ -26,12 +26,12 @@ static int processCommand(Database* db, const char* input) {
     
     if (isEmpty(command)) return OP_SUCCESS;
     
-    // Uppercase copy is used only for command keyword matching
+    /* Uppercase copy is used only for command keyword matching */
     char upperCmd[MAX_COMMAND_LEN];
     strcpy(upperCmd, command);
     toUpperCase(upperCmd);
     
-    // EXIT
+    /* EXIT */
     if (strcmp(upperCmd, "EXIT") == 0) {
         if (db->isOpen && db->isDirty) {
             char response[16];
@@ -64,7 +64,7 @@ static int processCommand(Database* db, const char* input) {
         return OP_EXIT;
     }
     
-    // OPEN
+    /* OPEN */
     if (strncmp(upperCmd, "OPEN", 4) == 0) {
         char filename[MAX_FILENAME_LEN];
         const char* fileStart = command + 4;
@@ -83,7 +83,7 @@ static int processCommand(Database* db, const char* input) {
         return OP_SUCCESS;
     }
     
-    // SWITCH
+    /* SWITCH */
     if (strncmp(upperCmd, "SWITCH", 6) == 0) {
         char filename[MAX_FILENAME_LEN];
         const char* fileStart = command + 6;
@@ -103,13 +103,13 @@ static int processCommand(Database* db, const char* input) {
         return OP_SUCCESS;
     }
     
-    // CLOSE
+    /* CLOSE */
     if (strcmp(upperCmd, "CLOSE") == 0) {
         closeDatabase(db);
         return OP_SUCCESS;
     }
     
-    // SAVE
+    /* SAVE */
     if (strcmp(upperCmd, "SAVE") == 0) {
         if (!db->isOpen) {
             printf("CMS: No database open.\n");
@@ -119,7 +119,7 @@ static int processCommand(Database* db, const char* input) {
         return OP_SUCCESS;
     }
     
-    // AUTOSAVE
+    /* AUTOSAVE */
     if (strcmp(upperCmd, "AUTOSAVE") == 0) {
         printf("CMS: Autosave is currently %s.\n", 
                isAutosaveEnabled() ? "ON" : "OFF");
@@ -143,19 +143,19 @@ static int processCommand(Database* db, const char* input) {
         return OP_SUCCESS;
     }
     
-    // HELP
+    /* HELP */
     if (strcmp(upperCmd, "HELP") == 0) {
         displayHelp();
         return OP_SUCCESS;
     }
     
-    // Commands below this point require a database to be open
+    /* Commands below this point require a database to be open */
     if (!db->isOpen) {
         printf("CMS: No database open. Use OPEN command first.\n");
         return OP_SUCCESS;
     }
     
-    // SHOW commands
+    /* SHOW commands */
     if (strcmp(upperCmd, "SHOW") == 0) {
         showMenu(db);
         return OP_SUCCESS;
@@ -166,21 +166,21 @@ static int processCommand(Database* db, const char* input) {
         return OP_SUCCESS;
     }
     
-    // SHOW ALL SORT BY - delegate parsing to enhancement module
+    /* SHOW ALL SORT BY - delegate parsing to enhancement module */
     int sortResult = parseAndExecuteSort(db, upperCmd);
     if (sortResult >= 0) return OP_SUCCESS;
     
-    // SHOW ALL WHERE MARK - delegate parsing and validation
+    /* SHOW ALL WHERE MARK - delegate parsing and validation */
     int filterResult = parseAndExecuteMarkFilter(db, input);
     if (filterResult >= 0) return OP_SUCCESS;
     
-    // SHOW SUMMARY
+    /* SHOW SUMMARY */
     if (strcmp(upperCmd, "SHOW SUMMARY") == 0) {
         showSummary(db);
         return OP_SUCCESS;
     }
     
-    // INSERT - supports both direct parameters and interactive prompts
+    /* INSERT - supports both direct parameters and interactive prompts */
     if (strncmp(upperCmd, "INSERT", 6) == 0) {
         char idStr[50];
         if (parseKeyValue(command, "ID", idStr)) {
@@ -196,7 +196,7 @@ static int processCommand(Database* db, const char* input) {
                 return OP_SUCCESS;
             }
             
-            // Check if all required parameters are provided for direct insert
+            /* Check if all required parameters are provided for direct insert */
             char temp[MAX_NAME_LEN];
             int hasAll = parseKeyValue(command, "Name", temp) && !isEmpty(temp) &&
                         parseKeyValue(command, "Programme", temp) && !isEmpty(temp) &&
@@ -215,7 +215,7 @@ static int processCommand(Database* db, const char* input) {
         return OP_SUCCESS;
     }
     
-    // QUERY
+    /* QUERY */
     if (strncmp(upperCmd, "QUERY", 5) == 0) {
         char idStr[50];
         if (parseKeyValue(command, "ID", idStr)) {
@@ -231,7 +231,7 @@ static int processCommand(Database* db, const char* input) {
         return OP_SUCCESS;
     }
     
-    // UPDATE - supports partial updates and interactive mode
+    /* UPDATE - supports partial updates and interactive mode */
     if (strncmp(upperCmd, "UPDATE", 6) == 0) {
         char idStr[50];
         if (parseKeyValue(command, "ID", idStr)) {
@@ -241,7 +241,7 @@ static int processCommand(Database* db, const char* input) {
                 return OP_SUCCESS;
             }
             
-            // Check if any field parameter is provided for direct update
+            /* Check if any field parameter is provided for direct update */
             char temp[MAX_NAME_LEN];
             int hasParams = parseKeyValue(command, "Name", temp) ||
                            parseKeyValue(command, "Programme", temp) ||
@@ -260,7 +260,7 @@ static int processCommand(Database* db, const char* input) {
         return OP_SUCCESS;
     }
     
-    // DELETE - require confirmation before removing a record
+    /* DELETE - require confirmation before removing a record */
     if (strncmp(upperCmd, "DELETE", 6) == 0) {
         char idStr[50];
         if (parseKeyValue(command, "ID", idStr)) {
@@ -277,7 +277,7 @@ static int processCommand(Database* db, const char* input) {
         return OP_SUCCESS;
     }
     
-    // SEARCH
+    /* SEARCH */
     if (strncmp(upperCmd, "SEARCH", 6) == 0) {
         char searchTerm[MAX_NAME_LEN];
         const char* searchStart = command + 6;
@@ -294,32 +294,32 @@ static int processCommand(Database* db, const char* input) {
         return OP_SUCCESS;
     }
     
-    // CHECK DUPLICATES
+    /* CHECK DUPLICATES */
     if (strcmp(upperCmd, "CHECK DUPLICATES") == 0 || 
         strcmp(upperCmd, "CHECK DUPLICATE") == 0) {
         checkDuplicates(db);
         return OP_SUCCESS;
     }
     
-    // EXPORT
+    /* EXPORT */
     if (strncmp(upperCmd, "EXPORT", 6) == 0) {
         exportToCSV(db, command);
         return OP_SUCCESS;
     }
     
-    // UNDO
+    /* UNDO */
     if (strcmp(upperCmd, "UNDO") == 0) {
         undoLastOperation(db);
         return OP_SUCCESS;
     }
     
-    // REDO
+    /* REDO */
     if (strcmp(upperCmd, "REDO") == 0) {
         redoLastOperation(db);
         return OP_SUCCESS;
     }
     
-    // Unknown command
+    /* Unknown command */
     printf("CMS: Unknown command. Type HELP for commands.\n");
     return OP_SUCCESS;
 }
@@ -332,41 +332,34 @@ int main() {
     Database db;
     initDatabase(&db);
     
-    // Initialize systems
+    /* Initialize systems */
     initializeUndoHistory();
     initializeAutosave(&db);
     
-    // Display declaration
+    /* Display declaration */
     displayDeclaration();
     
-    // Display welcome banner
+    /* Display welcome banner */
     printf("\n");
     printf("===============================================================================\n");
     printf("               CLASS MANAGEMENT SYSTEM - Group P1_2\n");
     printf("===============================================================================\n");
-    printf("Quick Start: OPEN | INSERT | SHOW | HELP | EXIT\n");
-    printf("Advanced: UNDO | REDO | EXPORT | SEARCH | AUTOSAVE | CHECK DUPLICATES\n");
-    printf("\n");
-    printf("Autosave Status: OFF (Type 'AUTOSAVE ON' to enable)\n");
-    printf("\n");
-    printf("Direct Commands: You can use both interactive and direct command modes:\n");
-    printf("  Interactive: INSERT ID=2301234 (prompts for each field)\n");
-    printf("  Direct:      INSERT ID=2301234 Name=\"John Doe\" Programme=\"CS\" Mark=85.5\n");
-    printf("               UPDATE ID=2301234 Mark=90.0\n");
-    printf("               SHOW ALL SORT BY ID ASC\n");
-    printf("               SHOW ALL SORT BY MARK DESC\n");
-    printf("               SHOW ALL WHERE MARK > 75\n");
-    printf("               CHECK DUPLICATES\n");
+    printf("Data folder:  data/   (place all database .txt files here)\n");
+    printf("Default file: P1_2-CMS.txt (use OPEN to load)\n");
+    printf("Quick Start:  OPEN | INSERT | SHOW | SAVE | HELP | EXIT\n");
+    printf("Advanced:     UNDO | REDO | EXPORT | SEARCH | AUTOSAVE | CHECK DUPLICATES\n");
+    printf("Autosave:     OFF by default (type 'AUTOSAVE ON' to enable)\n\n");
+    printf("Need help? Type HELP for the full command list and rules.\n");
     printf("===============================================================================\n");
     
-    // Main command loop
+    /* Main command loop */
     char input[MAX_COMMAND_LEN];
     int running = 1;
     
     while (running) {
-        // Display prompt with status indicator
+        /* Display prompt with status indicator */
         if (db.isOpen) {
-            // Show '*' when dirty, otherwise show nothing (no space)
+            /* Show '*' when dirty, otherwise show nothing (no space) */
             printf("P1_2%s: ", db.isDirty ? "*" : "");
         } else {
             printf("P1_2: ");
@@ -382,7 +375,7 @@ int main() {
         printf("\n");
     }
     
-    // Cleanup
+    /* Cleanup */
     printf("CMS: Cleaning up resources...\n");
     cleanupAutosave();
     cleanupUndoHistory();
