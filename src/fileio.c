@@ -10,6 +10,21 @@
 #include "fileio.h"
 #include "utils.h"
 
+// Build a path inside the data folder, rejecting any user-supplied directories
+static int buildDataPath(const char* filename, char* buffer, size_t bufferSize) {
+    if (!filename || !buffer || bufferSize == 0) {
+        return 0;
+    }
+    
+    // Disallow directory traversal or explicit paths; we only read/write under data/
+    if (strchr(filename, '/') || strchr(filename, '\\')) {
+        return 0;
+    }
+    
+    int written = snprintf(buffer, bufferSize, "data/%s", filename);
+    return written > 0 && (size_t)written < bufferSize;
+}
+
 /* ============================================================================
  * Database Management
  * ============================================================================ */
@@ -399,9 +414,25 @@ int openDatabase(Database* db, const char* filename) {
         return 0;
     }
     
-    FILE* file = fopen(filename, "r");
+    char cleanName[MAX_FILENAME_LEN];
+    strncpy(cleanName, filename, sizeof(cleanName) - 1);
+    cleanName[sizeof(cleanName) - 1] = '\0';
+    trimWhitespace(cleanName);
+    
+    if (isEmpty(cleanName)) {
+        printf("CMS: Filename cannot be empty.\n");
+        return 0;
+    }
+    
+    char resolvedPath[MAX_FILENAME_LEN];
+    if (!buildDataPath(cleanName, resolvedPath, sizeof(resolvedPath))) {
+        printf("CMS: Invalid filename \"%s\". Use a file inside the data folder.\n", cleanName);
+        return 0;
+    }
+    
+    FILE* file = fopen(resolvedPath, "r");
     if (!file) {
-        printf("CMS: Cannot open file \"%s\". File may not exist.\n", filename);
+        printf("CMS: Cannot open file \"%s\" in data/. File may not exist.\n", cleanName);
         return 0;
     }
     
@@ -457,10 +488,10 @@ int openDatabase(Database* db, const char* filename) {
     // Update database state after successful load
     db->isOpen = 1;
     db->isDirty = 0;
-    strncpy(db->filename, filename, MAX_FILENAME_LEN - 1);
+    strncpy(db->filename, cleanName, MAX_FILENAME_LEN - 1);
     db->filename[MAX_FILENAME_LEN - 1] = '\0';
     
-    printf("CMS: The database file \"%s\" is successfully opened.\n", filename);
+    printf("CMS: The database file \"%s\" is successfully opened.\n", cleanName);
     printf("     Loaded %d valid record(s).\n", recordsLoaded);
     
     if (recordsSkipped > 0) {
@@ -493,9 +524,15 @@ int saveDatabase(Database* db) {
         return 0;
     }
     
-    FILE* file = fopen(db->filename, "w");
+    char resolvedPath[MAX_FILENAME_LEN];
+    if (!buildDataPath(db->filename, resolvedPath, sizeof(resolvedPath))) {
+        printf("CMS: Cannot save. Invalid filename \"%s\".\n", db->filename);
+        return 0;
+    }
+    
+    FILE* file = fopen(resolvedPath, "w");
     if (!file) {
-        printf("CMS: Cannot save to \"%s\".\n", db->filename);
+        printf("CMS: Cannot save to \"%s\" in data/.\n", db->filename);
         return 0;
     }
     

@@ -25,7 +25,7 @@ void displayHelp(void) {
     printf("\n");
     
     printf("FILE MANAGEMENT:\n");
-    printf("  OPEN [filename]      Open database (default: P1_2-CMS.txt)\n");
+    printf("  OPEN [filename]      Open database (files stored in data/)\n");
     printf("  SWITCH filename      Switch to different file\n");
     printf("  CLOSE                Close current database\n");
     printf("  SAVE                 Save changes\n");
@@ -36,8 +36,8 @@ void displayHelp(void) {
     printf("DATA OPERATIONS:\n");
     printf("  SHOW                 Show menu with display options\n");
     printf("  SHOW ALL             Display all records\n");
-    printf("  SHOW ALL SORT BY [Field] [ASC/DESC]    Sort by field and order\n");
-    printf("  SHOW ALL WHERE MARK [op] [value]       Filter by mark (=, !=, <, >, <=, >=)\n");
+    printf("  SHOW ALL SORT BY [FIELD] [ASC/DESC]    Sort by field and order\n");
+    printf("  SHOW ALL WHERE MARK [OP] [VALUE]       Filter by mark (=, !=, <, >, <=, >=)\n");
     printf("  SHOW SUMMARY         Display statistics\n");
     printf("  INSERT ID=xxx        Add new record\n");
     printf("  QUERY ID=xxx         Find record by ID\n");
