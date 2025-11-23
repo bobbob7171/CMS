@@ -111,11 +111,10 @@ void displayDeclaration(void) {
     printf("  Declared by: Group P2_2\n");
     printf("\n");
     printf("  Team Members:\n");
-    printf("    1. [Member Name 1]\n");
-    printf("    2. [Member Name 2]\n");
-    printf("    3. [Member Name 3]\n");
-    printf("    4. [Member Name 4]\n");
-    printf("    5. [Member Name 5]\n");
+    printf("    1. Pham Anh Bao Khang\n");
+    printf("    2. Lee Jia Shin\n");
+    printf("    3. Phen Jian Xuann\n");
+    printf("    4. Gan Wei Yang\n");
     printf("\n");
     
     /* Display current date */
