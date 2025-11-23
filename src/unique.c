@@ -64,8 +64,8 @@ void displayHelp(void) {
     printf("\n");
     
     printf("STATUS INDICATORS:\n");
-    printf("  P1_2*:  = Unsaved changes\n");
-    printf("  P1_2:   = No unsaved changes\n");
+    printf("  P2_2*:  = Unsaved changes\n");
+    printf("  P2_2:   = No unsaved changes\n");
     printf("\n");
     printf("===============================================================================\n");
     printf("\n");
@@ -96,7 +96,7 @@ void displayDeclaration(void) {
     printf("-------------------------------------------------------------------------------\n");
     printf("\n");
     
-    printf("  We, the undersigned members of Group P1_2, hereby declare that:\n");
+    printf("  We, the undersigned members of Group P2_2, hereby declare that:\n");
     printf("\n");
     printf("  - We fully understand and agree to the plagiarism policy stated above\n");
     printf("  - We did not copy any code from others or external sources\n");
@@ -108,7 +108,7 @@ void displayDeclaration(void) {
     printf("\n");
     
     printf("-------------------------------------------------------------------------------\n");
-    printf("  Declared by: Group P1_2\n");
+    printf("  Declared by: Group P2_2\n");
     printf("\n");
     printf("  Team Members:\n");
     printf("    1. [Member Name 1]\n");

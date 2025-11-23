@@ -75,7 +75,7 @@ static int processCommand(Database* db, const char* input) {
             filename[MAX_FILENAME_LEN - 1] = '\0';
             trimWhitespace(filename);
         } else {
-            strcpy(filename, "P1_2-CMS.txt");
+            strcpy(filename, "P2_2-CMS.txt");
         }
         
         openDatabase(db, filename);
@@ -342,10 +342,10 @@ int main() {
     /* Display welcome banner */
     printf("\n");
     printf("===============================================================================\n");
-    printf("               CLASS MANAGEMENT SYSTEM - Group P1_2\n");
+    printf("               CLASS MANAGEMENT SYSTEM - Group P2_2\n");
     printf("===============================================================================\n");
     printf("Data folder:  data/   (place all database .txt files here)\n");
-    printf("Default file: P1_2-CMS.txt (use OPEN to load)\n");
+    printf("Default file: P2_2-CMS.txt (use OPEN to load)\n");
     printf("Quick Start:  OPEN | INSERT | SHOW | SAVE | HELP | EXIT\n");
     printf("Advanced:     UNDO | REDO | EXPORT | SEARCH | AUTOSAVE | CHECK DUPLICATES\n");
     printf("Autosave:     OFF by default (type 'AUTOSAVE ON' to enable)\n\n");
@@ -360,9 +360,9 @@ int main() {
         /* Display prompt with status indicator */
         if (db.isOpen) {
             /* Show '*' when dirty, otherwise show nothing (no space) */
-            printf("P1_2%s: ", db.isDirty ? "*" : "");
+            printf("P2_2%s: ", db.isDirty ? "*" : "");
         } else {
-            printf("P1_2: ");
+            printf("P2_2: ");
         }
         
         if (!fgets(input, sizeof(input), stdin)) break;

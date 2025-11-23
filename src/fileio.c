@@ -537,7 +537,7 @@ int saveDatabase(Database* db) {
     }
     
     /* Write file header and column names */
-    fprintf(file, "Database Name: P1_2-CMS\n");
+    fprintf(file, "Database Name: P2_2-CMS\n");
     fprintf(file, "Authors: Assistant Prof Oran Zane Devilly\n\n");
     fprintf(file, "Table Name: StudentRecords\n");
     fprintf(file, "ID\tName\tProgramme\tMark\n");

@@ -1,4 +1,4 @@
-Database Name: Sample-CMS
+Database Name: P2_2-CMS
 Authors: Assistant Prof Oran Zane Devilly
 
 Table Name: StudentRecords

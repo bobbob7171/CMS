@@ -649,7 +649,7 @@ int deleteRecord(Database* db, int id) {
     
     while (1) {
         printf("CMS: Are you sure you want to delete record with ID=%d? Type \"Y\" to confirm or \"N\" to cancel.\n", id);
-        printf("P1_2: ");
+        printf("P2_2: ");
         
         char response[16];
         if (!fgets(response, sizeof(response), stdin)) {
