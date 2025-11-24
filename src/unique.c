@@ -423,11 +423,6 @@ void initializeUndoHistory(void) {
     }
     
     historyInitialized = 1;
-    
-    /* Print a small diagnostic so the user knows memory cost of undo/redo */
-    size_t totalSize = sizeof(DatabaseSnapshot) * MAX_HISTORY;
-    printf("  Undo/Redo initialized: %d snapshots, %.2f KB total memory\n", 
-           MAX_HISTORY, totalSize / 1024.0);
 }
 
 void cleanupUndoHistory(void) {
@@ -565,8 +560,6 @@ void initializeAutosave(Database* db) {
     autosaveState.enabled = 0;
     autosaveState.modified = 0;
     autosaveState.initialized = 1;
-    
-    printf("  Autosave initialized (Status: OFF by default)\n");
 }
 
 void setAutosaveEnabled(int enabled) {
