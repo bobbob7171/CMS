@@ -163,9 +163,9 @@ int parseAndExecuteSort(Database* db, const char* command) {
         strcpy(field, "MARK");
         params += 4;
     } else {
-        printf("CMS: Invalid field. Usage: SHOW ALL SORT BY <FIELD> <ORDER>\n");
-        printf("     FIELD: ID or MARK\n");
-        printf("     ORDER: ASC or DESC (optional, defaults to ASC)\n");
+        printf("CMS: Invalid field.\nUsage: SHOW ALL SORT BY <FIELD> <ORDER>\n");
+        printf("       FIELD: ID or MARK\n");
+        printf("       ORDER: ASC or DESC (optional, defaults to ASC)\n");
         return 0;
     }
     
@@ -180,9 +180,9 @@ int parseAndExecuteSort(Database* db, const char* command) {
         } else if (strncmp(params, "DESC", 4) == 0) {
             strcpy(order, "DESC");
         } else {
-            printf("CMS: Invalid order. Usage: SHOW ALL SORT BY <FIELD> <ORDER>\n");
-            printf("     FIELD: ID or MARK\n");
-            printf("     ORDER: ASC or DESC (optional, defaults to ASC)\n");
+            printf("CMS: Invalid field.\nUsage: SHOW ALL SORT BY <FIELD> <ORDER>\n");
+        printf("       FIELD: ID or MARK\n");
+        printf("       ORDER: ASC or DESC (optional, defaults to ASC)\n");
             return 0;
         }
     }
@@ -296,8 +296,8 @@ int parseAndExecuteMarkFilter(Database* db, const char* command) {
     while (*params == ' ') params++;
     
     if (*params == '\0') {
-        printf("CMS: Missing operator and value. Usage: SHOW ALL WHERE MARK <op> <value>\n");
-        printf("     Operators: =, !=, <, >, <=, >=\n");
+        printf("CMS: Missing operator and value. \nUsage: SHOW ALL WHERE MARK <op> <value>\n");
+        printf("       Operators: =, !=, <, >, <=, >=\n");
         return 0;
     }
     
@@ -320,7 +320,7 @@ int parseAndExecuteMarkFilter(Database* db, const char* command) {
     while (*params == ' ') params++;
     
     if (*params == '\0') {
-        printf("CMS: Missing value. Usage: SHOW ALL WHERE MARK <op> <value>\n");
+        printf("CMS: Missing value.\nUsage: SHOW ALL WHERE MARK <op> <value>\n");
         return 0;
     }
     

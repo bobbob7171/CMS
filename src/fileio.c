@@ -512,7 +512,7 @@ int openDatabase(Database* db, const char* filename) {
         }
         
         printf("  All loaded records have complete data.\n");
-        printf("===============================================================================\n\n");
+        printf("===============================================================================\n");
     }
     
     return 1;

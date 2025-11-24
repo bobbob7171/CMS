@@ -113,7 +113,7 @@ void displayDeclaration(void) {
     printf("  Team Members:\n");
     printf("    1. Pham Anh Bao Khang\n");
     printf("    2. Lee Jia Shin\n");
-    printf("    3. Phen Jian Xuann\n");
+    printf("    3. Phen Jian Xuan\n");
     printf("    4. Gan Wei Yang\n");
     printf("\n");
     
